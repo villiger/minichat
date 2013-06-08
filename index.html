@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+<head>
+	<title>Mini-Chat</title>
+	<link rel="stylesheet/less" type="text/css" href="/css/style.less" />
+	<script src="/js/less.js" type="text/javascript"></script>
+	<script src="/js/jquery.js"></script>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	$(document).ready(function () {
+		var addMsg = function(data) {
+			var html = '<div class="msg"><span class="name">' + data.from + '</span>: ' + data.text + '</div>';
+			$('#chat-log').append(html);
+		};
+		
+		var socket = io.connect('http://localhost');
+		socket.on('msg', function (data) {
+			addMsg(data);
+  	});
+		
+		socket.on('nickname', function (name) {
+			$('#name').val(name);
+		});
+		
+		$('#name').on('change', function () {
+			var name = $(this).val();
+			if (name.length) {
+				socket.emit('set nickname', name);
+			}
+		});
+		
+		$('#chat-input').on('keydown', function (event) {
+			var input = $(this);
+			if (event.which == 13) {
+				var msg = $(this).val();
+				$(this).val('');
+				socket.emit('msg', msg);
+				
+				addMsg({
+					from : $('#name').val(),
+					text : msg
+				});
+			}
+		});
+	});
+	</script>
+</head>
+<body>
+	<div class="main" id="main">
+		<div class="name-container">
+			Your name:
+			<input type="text" id="name" class="name" />
+		</div>
+		<div class="chat-log" id="chat-log"></div>
+		<div class="chat-input-container">
+			<input type="text" id="chat-input" class="chat-input" placeholder="Enter a chat message.." />
+		</div>
+	</div>
+</body>
+</html>

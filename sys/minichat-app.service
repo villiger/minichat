@@ -1,0 +1,12 @@
+[Service]
+ExecStart=/usr/bin/node /srv/minichat/app.js
+Restart=always
+StandardOutput=syslog
+SyslogIdentifier=MiniChatApp
+User=avi
+Group=users
+Environment=PATH=/usr/bin:/usr/local/bin
+Environment=NODE_ENV=staging
+
+[Install]
+WantedBy=multi-user.target
